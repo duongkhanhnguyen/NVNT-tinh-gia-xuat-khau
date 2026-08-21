@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phần Mềm Tính Toán Lô Hàng Xuất Khẩu</title>
+    <style>
+        :root {
+            --bg-light-blue: #eef6fc;
+            --header-blue: #1d5288;
+            --accent-red: #f8d7da;
+            --border-red: #f5c6cb;
+            --gold: #d4af37;
+            --gold-hover: #aa8c2c;
+            --text-dark: #212529;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-light-blue);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #d0e2f0;
+        }
+
+        /* Header & Navigation */
+        .app-header {
+            background-color: var(--header-blue);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--gold);
+        }
+
+        .app-header h2 {
+            margin: 0;
+            font-size: 18pt;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #e2ebf3;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-weight: bold;
+            font-size: 11pt;
+            color: var(--header-blue);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background-color: #d2e3f3;
+        }
+
+        .tab-btn.active {
+            background-color: var(--card-bg);
+            color: var(--header-blue);
+            border-top: 3px solid var(--gold);
+        }
+
+        /* Sub-tabs CSS */
+        .sub-tabs {
+            display: flex;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .sub-tab-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-weight: bold;
+            font-size: 10pt;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-right: 1px solid #cbd5e1;
+        }
+
+        .sub-tab-btn:last-child {
+            border-right: none;
+        }
+
+        .sub-tab-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .sub-tab-btn.active {
+            background-color: var(--header-blue);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 11pt;
+        }
+
+        .form-group input[readonly] {
+            background-color: #e9ecef;
+            font-weight: bold;
+            color: var(--header-blue);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Detail Tables Styling */
+        .detail-section {
+            background: #fdfdfd;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--header-blue);
+            font-size: 11pt;
+            text-transform: uppercase;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5px;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .detail-table th, .detail-table td {
+            border: 1px solid #e0e0e0;
+            padding: 6px 8px;
+            font-size: 10pt;
+        }
+
+        .detail-table th {
+            background-color: #f1f5f9;
+            color: #333;
+            text-align: center;
+        }
+
+        .detail-table input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+            font-size: 10pt;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 9pt;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-add {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: #218838;
+        }
+
+        .btn-del {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-del:hover {
+            background-color: #c82333;
+        }
+
+        /* Calculation Card Styles */
+        .alert-red {
+            background-color: var(--accent-red);
+            border: 1px solid var(--border-red);
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .action-bar {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 11pt;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-gold {
+            background-color: var(--gold);
+            color: white;
+        }
+
+        .btn-gold:hover {
+            background-color: var(--gold-hover);
+        }
+
+        /* AN KHUNG IN TRÊN GIAO DIỆN WEB THƯỜNG */
+        #pdf-template-wrapper {
+            display: none;
+        }
+
+        #pdf-template {
+            width: 100%;
+            background: white;
+            color: black;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            line-height: 1.3;
+            box-sizing: border-box;
+        }
+
+        .pdf-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .pdf-section-title {
+            font-weight: bold;
+            border-bottom: 1.5pt solid black;
+            padding-bottom: 2px;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .pdf-table th, .pdf-table td {
+            border: 1px solid black;
+            padding: 5px 7px;
+            text-align: left;
+            font-size: 10.5pt;
+        }
+
+        .pdf-table th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        .pdf-table td.number {
+            text-align: right;
+        }
+
+        .pdf-footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .pdf-footer div {
+            width: 45%;
+        }
+
+        /* ---------------------------------------------------- */
+        /* CẤU HÌNH IN CHUẨN (PRINT MEDIA CSS) - CHÍNH BẢO ĐẢM HẾT LỖI */
+        /* ---------------------------------------------------- */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            /* Ẩn toàn bộ giao diện app web */
+            .container {
+                display: none !important;
+            }
+            /* Hiện duy nhất trang báo cáo PDF */
+            #pdf-template-wrapper {
+                display: block !important;
+                width: 100% !important;
+            }
+            #pdf-template {
+                width: 100% !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="app-header">
+        <h2>TÍNH TOÁN TÀI CHÍNH LÔ HÀNG XUẤT KHẨU</h2>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-info', this)">1. THÔNG TIN CHUNG</button>
+        <button class="tab-btn" onclick="switchTab('tab-calc', this)">2. SỐ LIỆU TÍNH TOÁN</button>
+    </div>
+
+    <!-- TAB 1: THÔNG TIN CHUNG -->
+    <div id="tab-info" class="tab-content active">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Họ và tên sinh viên:</label>
+                <input type="text" id="studentName" placeholder="Nhập họ tên..." oninput="calculate()">
+            </div>
+            <div class="form-group">
+                <label>Mã số sinh viên (MSSV):</label>
+                <input type="text" id="studentId" placeholder="Nhập MSSV..." oninput="calculate()">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Lớp học phần:</label>
+                <input type="text" id="className" placeholder="Nhập lớp..." oninput="calculate()">
+            </div>
+            <div class="form-group">
+                <label>Giảng viên hướng dẫn:</label>
+                <input type="text" id="teacherName" placeholder="Nhập tên giảng viên..." oninput="calculate()">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Tên bài tập / Đề tài:</label>
+            <input type="text" id="assignmentTitle" value="Tính toán hiệu quả tài chính và điểm hòa vốn lô hàng xuất khẩu Áo sơ mi sang Mỹ" oninput="calculate()">
+        </div>
+    </div>
+
+    <!-- TAB 2: SỐ LIỆU TÍNH TOÁN -->
+    <div id="tab-calc" class="tab-content">
+        <div class="alert-red">
+            <strong>* Lưu ý:</strong> Vui lòng chọn điều kiện giá xuất khẩu (EXW, FOB, CIF, DAP, DDP) và nhập chi tiết các khoản mục. Số liệu tổng hợp sẽ tự động tính toán.
+        </div>
+
+        <!-- CÁC TAB PHỤ THEO ĐIỀU KIỆN GIÁ INCOTERMS -->
+        <div class="sub-tabs">
+            <button class="sub-tab-btn active" onclick="switchIncoterm('EXW', this)">Giá EXW</button>
+            <button class="sub-tab-btn" onclick="switchIncoterm('FOB', this)">Giá FOB</button>
+            <button class="sub-tab-btn" onclick="switchIncoterm('CIF', this)">Giá CIF</button>
+            <button class="sub-tab-btn" onclick="switchIncoterm('DAP', this)">Giá DAP</button>
+            <button class="sub-tab-btn" onclick="switchIncoterm('DDP', this)">Giá DDP</button>
+        </div>
+
+        <!-- NỘI DUNG TÍNH TOÁN -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Sản lượng lô hàng (Chiếc):</label>
+                <input type="number" id="inpQuantity" value="50000" oninput="calculate()">
+            </div>
+            <div class="form-group">
+                <label id="lblPrice">Giá bán EXW (USD/chiếc):</label>
+                <input type="number" step="0.01" id="inpPrice" value="15.00" oninput="calculate()">
+            </div>
+        </div>
+
+        <!-- BẢNG 1: CHI TIẾT GIÁ THÀNH SẢN XUẤT (COGS) -->
+        <div class="detail-section">
+            <h4>Chi tiết Giá thành Sản xuất - COGS (USD/chiếc)</h4>
+            <table class="detail-table" id="tblCogs">
+                <thead>
+                    <tr>
+                        <th>Hạng mục chi phí sản xuất</th>
+                        <th style="width: 150px;">Chi phí (USD/sp)</th>
+                        <th style="width: 50px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="Vải chính & phụ liệu" placeholder="Tên chi phí..."></td>
+                        <td><input type="number" step="0.01" value="6.50" class="cogs-val" oninput="calculate()"></td>
+                        <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" value="Chi phí nhân công trực tiếp" placeholder="Tên chi phí..."></td>
+                        <td><input type="number" step="0.01" value="3.00" class="cogs-val" oninput="calculate()"></td>
+                        <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" value="Chi phí sản xuất chung" placeholder="Tên chi phí..."></td>
+                        <td><input type="number" step="0.01" value="2.00" class="cogs-val" oninput="calculate()"></td>
+                        <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn-sm btn-add" onclick="addRow('tblCogs', 'cogs-val')">+ Thêm mục chi phí COGS</button>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Giá thành sản xuất - COGS (Tự động tổng hợp - USD/chiếc):</label>
+                <input type="number" step="0.01" id="inpCogs" value="11.50" readonly>
+            </div>
+        </div>
+
+        <!-- BẢNG 2: CHI TIẾT LOGISTICS -->
+        <div class="detail-section">
+            <h4 id="lblLogisticsSection">Chi tiết Chi phí Logistics (USD/chiếc)</h4>
+            <table class="detail-table" id="tblLogistics">
+                <thead>
+                    <tr>
+                        <th>Hạng mục chi phí Logistics</th>
+                        <th style="width: 150px;">Chi phí (USD/sp)</th>
+                        <th style="width: 50px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyLogistics">
+                    <!-- Dữ liệu load động -->
+                </tbody>
+            </table>
+            <button class="btn-sm btn-add" onclick="addRow('tblLogistics', 'log-val')">+ Thêm mục chi phí Logistics</button>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label id="lblLogisticsTotal">Chi phí Logistics (Tự động tổng hợp - USD/chiếc):</label>
+                <input type="number" step="0.01" id="inpLogistics" value="0.00" readonly>
+            </div>
+        </div>
+
+        <!-- BẢNG 3: CHI TIẾT QUẢN LÝ, PHỤ PHÍ -->
+        <div class="detail-section">
+            <h4>Chi tiết Chi phí Quản lý, C/O, Phụ phí (USD/chiếc)</h4>
+            <table class="detail-table" id="tblAdmin">
+                <thead>
+                    <tr>
+                        <th>Hạng mục chi phí</th>
+                        <th style="width: 150px;">Chi phí (USD/sp)</th>
+                        <th style="width: 50px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="Chi phí xin C/O & Kiểm định chất lượng" placeholder="Tên chi phí..."></td>
+                        <td><input type="number" step="0.01" value="0.50" class="admin-val" oninput="calculate()"></td>
+                        <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" value="Chi phí quản lý đơn hàng & Bảo hiểm" placeholder="Tên chi phí..."></td>
+                        <td><input type="number" step="0.01" value="0.80" class="admin-val" oninput="calculate()"></td>
+                        <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn-sm btn-add" onclick="addRow('tblAdmin', 'admin-val')">+ Thêm mục chi phí Quản lý/Phụ phí</button>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Chi phí Quản lý, C/O, Phụ phí (Tự động tổng hợp - USD/chiếc):</label>
+                <input type="number" step="0.01" id="inpAdmin" value="1.30" readonly>
+            </div>
+        </div>
+
+        <!-- BẢNG 4: CHI TIẾT ĐỊNH PHÍ -->
+        <div class="detail-section">
+            <h4>Chi tiết Tổng Chi phí Định phí - Fixed Costs (USD)</h4>
+            <table class="detail-table" id="tblFixedCost">
+                <thead>
+                    <tr>
+                        <th>Hạng mục định phí</th>
+                        <th style="width: 150px;">Chi phí (USD)</th>
+                        <th style="width: 50px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="Khấu hao máy móc phân bổ cho lô hàng" placeholder="Tên chi phí..."></td>
+                        <td><input type="number" step="1" value="10000" class="fc-val" oninput="calculate()"></td>
+                        <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" value="Chi phí quản lý cố định phân bổ" placeholder="Tên chi phí..."></td>
+                        <td><input type="number" step="1" value="5000" class="fc-val" oninput="calculate()"></td>
+                        <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn-sm btn-add" onclick="addRow('tblFixedCost', 'fc-val')">+ Thêm mục Định phí</button>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Tổng Chi phí Định phí - Fixed Costs (Tự động tổng hợp - USD):</label>
+                <input type="number" id="inpFixedCost" value="15000" readonly>
+            </div>
+        </div>
+
+        <!-- BẢNG XEM TRƯỚC KẾT QUẢ -->
+        <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--gold); padding-bottom: 5px; margin-top: 20px;">
+            KẾT QUẢ TÍNH TOÁN DỰ KIẾN (<span id="outIncotermLabel">EXW</span>)
+        </h3>
+        <table class="pdf-table" style="background: #fff;">
+            <thead>
+                <tr>
+                    <th>Chỉ tiêu</th>
+                    <th>Đơn giá / Tỷ lệ</th>
+                    <th>Tổng giá trị (USD)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Tổng Doanh Thu</strong></td>
+                    <td id="outUnitPrice" class="number">0.00 USD</td>
+                    <td id="outTotalRevenue" class="number" style="font-weight: bold; color: green;">0 USD</td>
+                </tr>
+                <tr>
+                    <td><strong>Tổng Chi Phí</strong></td>
+                    <td id="outUnitCost" class="number">0.00 USD</td>
+                    <td id="outTotalCost" class="number" style="font-weight: bold; color: red;">0 USD</td>
+                </tr>
+                <tr>
+                    <td><strong>Lợi Nhuận Ròng</strong></td>
+                    <td id="outUnitProfit" class="number">0.00 USD</td>
+                    <td id="outNetProfit" class="number" style="font-weight: bold; color: blue;">0 USD</td>
+                </tr>
+                <tr>
+                    <td><strong>Tỷ suất Lợi nhuận / Doanh thu (ROS)</strong></td>
+                    <td colspan="2" id="outROS" class="number" style="font-weight: bold;">0%</td>
+                </tr>
+                <tr>
+                    <td><strong>Tỷ suất Lợi nhuận / Chi phí (ROC)</strong></td>
+                    <td colspan="2" id="outROC" class="number" style="font-weight: bold;">0%</td>
+                </tr>
+                <tr>
+                    <td><strong>Điểm Hòa Vốn Sản Lượng (Break-even Volume)</strong></td>
+                    <td colspan="2" id="outBEP" class="number" style="font-weight: bold; color: purple;">0 chiếc</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- BẢNG ĐIỀU KHIỂN XUẤT FILE -->
+    <div class="action-bar">
+        <button class="btn btn-gold" onclick="generatePDF()">In / Xuất File PDF (A4)</button>
+    </div>
+</div>
+
+<!-- KHUNG MẪU XUẤT PDF CHUẨN A4 -->
+<div id="pdf-template-wrapper">
+    <div id="pdf-template">
+        <div class="pdf-header">
+            <h3 style="margin: 0; font-size: 13pt;">BÁO CÁO KẾT QUẢ TÍNH TOÁN TÀI CHÍNH LÔ HÀNG XUẤT KHẨU</h3>
+            <p style="margin: 5px 0 0 0; font-weight: normal; font-style: italic;">(Nộp Giảng viên hướng dẫn)</p>
+        </div>
+
+        <div class="pdf-section-title">I. THÔNG TIN CHUNG</div>
+        <table style="width: 100%; margin-bottom: 10px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; padding: 3px 0;"><strong>Họ và tên sinh viên:</strong> <span id="pdfStudentName">................................</span></td>
+                <td style="width: 50%; padding: 3px 0;"><strong>MSSV:</strong> <span id="pdfStudentId">................</span></td>
+            </tr>
+            <tr>
+                <td style="padding: 3px 0;"><strong>Lớp học phần:</strong> <span id="pdfClassName">................</span></td>
+                <td style="padding: 3px 0;"><strong>Giảng viên hướng dẫn:</strong> <span id="pdfTeacherName">................................</span></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding: 3px 0;"><strong>Đề tài:</strong> <span id="pdfAssignmentTitle">................</span></td>
+            </tr>
+        </table>
+
+        <div class="pdf-section-title">II. THÔNG TIN ĐẦU VÀO LÔ HÀNG (<span id="pdfIncotermType">EXW</span>)</div>
+        <table class="pdf-table">
+            <tr>
+                <th>Hạng mục</th>
+                <th>Giá trị</th>
+                <th>Đơn vị tính</th>
+            </tr>
+            <tr>
+                <td>Sản lượng lô hàng (Q)</td>
+                <td class="number" id="pdfInpQuantity">0</td>
+                <td style="text-align: center;">Chiếc</td>
+            </tr>
+            <tr>
+                <td>Giá bán xuất khẩu (<span id="pdfPriceTypeLabel">EXW</span>)</td>
+                <td class="number" id="pdfInpPrice">0.00</td>
+                <td style="text-align: center;">USD/chiếc</td>
+            </tr>
+            <tr>
+                <td>Giá thành sản xuất (COGS)</td>
+                <td class="number" id="pdfInpCogs">0.00</td>
+                <td style="text-align: center;">USD/chiếc</td>
+            </tr>
+            <tr>
+                <td>Chi phí Logistics (<span id="pdfLogisticsTypeLabel">EXW</span>)</td>
+                <td class="number" id="pdfInpLogistics">0.00</td>
+                <td style="text-align: center;">USD/chiếc</td>
+            </tr>
+            <tr>
+                <td>Chi phí Quản lý, C/O, Phụ phí</td>
+                <td class="number" id="pdfInpAdmin">0.00</td>
+                <td style="text-align: center;">USD/chiếc</td>
+            </tr>
+            <tr>
+                <td>Tổng Định phí (Fixed Costs)</td>
+                <td class="number" id="pdfInpFixedCost">0</td>
+                <td style="text-align: center;">USD</td>
+            </tr>
+        </table>
+
+        <div class="pdf-section-title">III. KẾT QUẢ TÍNH TOÁN DÀNH CHO LÔ HÀNG</div>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th>Chỉ tiêu Tài chính</th>
+                    <th>Đơn giá / Tỷ lệ</th>
+                    <th>Tổng giá trị (USD)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. Tổng Doanh Thu</strong></td>
+                    <td class="number" id="pdfOutUnitPrice">0.00 USD</td>
+                    <td class="number" id="pdfOutTotalRevenue"><strong>0 USD</strong></td>
+                </tr>
+                <tr>
+                    <td>- Giá thành sản xuất (COGS)</td>
+                    <td class="number" id="pdfOutUnitCogs">0.00 USD</td>
+                    <td class="number" id="pdfOutTotalCogs">0 USD</td>
+                </tr>
+                <tr>
+                    <td>- Chi phí Logistics</td>
+                    <td class="number" id="pdfOutUnitLogistics">0.00 USD</td>
+                    <td class="number" id="pdfOutTotalLogistics">0 USD</td>
+                </tr>
+                <tr>
+                    <td>- Chi phí Quản lý, Phụ phí</td>
+                    <td class="number" id="pdfOutUnitAdmin">0.00 USD</td>
+                    <td class="number" id="pdfOutTotalAdmin">0 USD</td>
+                </tr>
+                <tr>
+                    <td><strong>2. Tổng Chi Phí (Biến phí + Định phí)</strong></td>
+                    <td class="number" id="pdfOutUnitCost">0.00 USD</td>
+                    <td class="number" id="pdfOutTotalCost"><strong>0 USD</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>3. Lợi Nhuận Ròng (Net Profit)</strong></td>
+                    <td class="number" id="pdfOutUnitProfit">0.00 USD</td>
+                    <td class="number" id="pdfOutNetProfit"><strong>0 USD</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>4. Tỷ suất Lợi nhuận trên Doanh thu (ROS)</strong></td>
+                    <td colspan="2" class="number" id="pdfOutROS"><strong>0%</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>5. Tỷ suất Lợi nhuận trên Chi phí (ROC)</strong></td>
+                    <td colspan="2" class="number" id="pdfOutROC"><strong>0%</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>6. Điểm hòa vốn sản lượng (Break-even Volume)</strong></td>
+                    <td colspan="2" class="number" id="pdfOutBEP"><strong>0 chiếc</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pdf-footer">
+            <div>
+                <p><strong>XÁC NHẬN CỦA SINH VIÊN</strong><br><i>(Ký và ghi rõ họ tên)</i></p>
+                <br><br>
+                <p><strong id="pdfSignStudent">................................</strong></p>
+            </div>
+            <div>
+                <p><strong>GIẢNG VIÊN CHẤM ĐIỂM</strong><br><i>(Ký và ghi rõ họ tên)</i></p>
+                <br><br>
+                <p><strong id="pdfSignTeacher">................................</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentIncoterm = 'EXW';
+
+    const incotermConfigs = {
+        'EXW': {
+            priceLabel: 'Giá bán EXW (USD/chiếc):',
+            defaultPrice: 15.00,
+            logisticsSection: 'Chi tiết Chi phí Logistics EXW (Nhà xưởng -> Điểm giao)',
+            logisticsTotalLabel: 'Chi phí Logistics EXW (Tự động tổng hợp - USD/chiếc):',
+            items: [
+                { name: 'Chi phí đóng gói & dán nhãn tại xưởng', val: 0.10 }
+            ]
+        },
+        'FOB': {
+            priceLabel: 'Giá bán FOB (USD/chiếc):',
+            defaultPrice: 17.00,
+            logisticsSection: 'Chi tiết Chi phí Logistics EXW -> FOB (USD/chiếc)',
+            logisticsTotalLabel: 'Chi phí Logistics EXW -> FOB (Tự động tổng hợp - USD/chiếc):',
+            items: [
+                { name: 'Vận chuyển nội địa ra cảng xuất', val: 0.50 },
+                { name: 'Thủ tục Hải quan xuất khẩu & Phụ phí cảng (THC)', val: 0.20 }
+            ]
+        },
+        'CIF': {
+            priceLabel: 'Giá bán CIF (USD/chiếc):',
+            defaultPrice: 19.50,
+            logisticsSection: 'Chi tiết Chi phí Logistics EXW -> CIF (USD/chiếc)',
+            logisticsTotalLabel: 'Chi phí Logistics EXW -> CIF (Tự động tổng hợp - USD/chiếc):',
+            items: [
+                { name: 'Vận chuyển nội địa VN & Thủ tục Hải quan xuất', val: 0.70 },
+                { name: 'Cước vận chuyển quốc tế (Ocean Freight)', val: 1.80 },
+                { name: 'Bảo hiểm hàng hóa quốc tế (Insurance)', val: 0.10 }
+            ]
+        },
+        'DAP': {
+            priceLabel: 'Giá bán DAP (USD/chiếc):',
+            defaultPrice: 20.50,
+            logisticsSection: 'Chi tiết Chi phí Logistics EXW -> DAP (USD/chiếc)',
+            logisticsTotalLabel: 'Chi phí Logistics EXW -> DAP (Tự động tổng hợp - USD/chiếc):',
+            items: [
+                { name: 'Vận chuyển nội địa VN & Hải quan xuất', val: 0.70 },
+                { name: 'Cước vận chuyển quốc tế', val: 1.80 },
+                { name: 'Bảo hiểm hàng hóa', val: 0.10 },
+                { name: 'Vận chuyển nội địa tại nước nhập khẩu', val: 0.80 }
+            ]
+        },
+        'DDP': {
+            priceLabel: 'Giá bán DDP (USD/chiếc):',
+            defaultPrice: 22.00,
+            logisticsSection: 'Chi tiết Chi phí Logistics EXW -> DDP (USD/chiếc)',
+            logisticsTotalLabel: 'Chi phí Logistics EXW -> DDP (Tự động tổng hợp - USD/chiếc):',
+            items: [
+                { name: 'Vận chuyển nội địa VN & Thủ tục Hải quan xuất', val: 0.70 },
+                { name: 'Cước vận chuyển quốc tế (Ocean Freight)', val: 1.80 },
+                { name: 'Thuế nhập khẩu tại Mỹ & Vận chuyển nội địa Mỹ', val: 1.70 }
+            ]
+        }
+    };
+
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function switchIncoterm(code, btn) {
+        currentIncoterm = code;
+        
+        document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        const config = incotermConfigs[code];
+        document.getElementById('lblPrice').innerText = config.priceLabel;
+        document.getElementById('inpPrice').value = config.defaultPrice.toFixed(2);
+        document.getElementById('lblLogisticsSection').innerText = config.logisticsSection;
+        document.getElementById('lblLogisticsTotal').innerText = config.logisticsTotalLabel;
+        document.getElementById('outIncotermLabel').innerText = code;
+
+        const tbody = document.getElementById('tbodyLogistics');
+        tbody.innerHTML = '';
+        config.items.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="${item.name}" placeholder="Tên chi phí..."></td>
+                <td><input type="number" step="0.01" value="${item.val.toFixed(2)}" class="log-val" oninput="calculate()"></td>
+                <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        calculate();
+    }
+
+    function fmt(num) {
+        return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+    }
+    function fmtInt(num) {
+        return new Intl.NumberFormat('en-US').format(Math.ceil(num));
+    }
+
+    function addRow(tableId, valueClass) {
+        const tbody = document.getElementById(tableId).querySelector('tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" placeholder="Tên chi phí..."></td>
+            <td><input type="number" step="0.01" value="0.00" class="${valueClass}" oninput="calculate()"></td>
+            <td style="text-align: center;"><button class="btn-sm btn-del" onclick="removeRow(this)">Xóa</button></td>
+        `;
+        tbody.appendChild(tr);
+        calculate();
+    }
+
+    function removeRow(btn) {
+        const row = btn.closest('tr');
+        row.remove();
+        calculate();
+    }
+
+    function sumClass(className) {
+        let total = 0;
+        document.querySelectorAll('.' + className).forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        return total;
+    }
+
+    function updateStudentInfoToPDF() {
+        const sName = document.getElementById('studentName').value || '................................';
+        const sId = document.getElementById('studentId').value || '................';
+        const cName = document.getElementById('className').value || '................';
+        const tName = document.getElementById('teacherName').value || '................................';
+        const aTitle = document.getElementById('assignmentTitle').value || '................';
+
+        document.getElementById('pdfStudentName').innerText = sName;
+        document.getElementById('pdfStudentId').innerText = sId;
+        document.getElementById('pdfClassName').innerText = cName;
+        document.getElementById('pdfTeacherName').innerText = tName;
+        document.getElementById('pdfAssignmentTitle').innerText = aTitle;
+        
+        document.getElementById('pdfSignStudent').innerText = sName;
+        document.getElementById('pdfSignTeacher').innerText = tName;
+    }
+
+    function calculate() {
+        const cogsCalculated = sumClass('cogs-val');
+        const logCalculated = sumClass('log-val');
+        const adminCalculated = sumClass('admin-val');
+        const fcCalculated = sumClass('fc-val');
+
+        document.getElementById('inpCogs').value = cogsCalculated.toFixed(2);
+        document.getElementById('inpLogistics').value = logCalculated.toFixed(2);
+        document.getElementById('inpAdmin').value = adminCalculated.toFixed(2);
+        document.getElementById('inpFixedCost').value = Math.round(fcCalculated);
+
+        const Q = parseFloat(document.getElementById('inpQuantity').value) || 0;
+        const P = parseFloat(document.getElementById('inpPrice').value) || 0;
+        const cogs = cogsCalculated;
+        const log = logCalculated;
+        const admin = adminCalculated;
+        const FC = fcCalculated;
+
+        const VC_unit = cogs + log + admin;
+        const Total_Revenue = Q * P;
+        const Total_VC = Q * VC_unit;
+        const Total_Cost = Total_VC + FC;
+        const Unit_Cost = Q > 0 ? (Total_Cost / Q) : 0;
+        
+        const Net_Profit = Total_Revenue - Total_Cost;
+        const Unit_Profit = P - Unit_Cost;
+
+        const ROS = Total_Revenue > 0 ? (Net_Profit / Total_Revenue) * 100 : 0;
+        const ROC = Total_Cost > 0 ? (Net_Profit / Total_Cost) * 100 : 0;
+
+        let BEP = 0;
+        const Margin = P - VC_unit;
+        if (Margin > 0) {
+            BEP = FC / Margin;
+        } else {
+            BEP = Infinity;
+        }
+
+        // Cập nhật giao diện Tab 2
+        document.getElementById('outUnitPrice').innerText = fmt(P) + " USD";
+        document.getElementById('outTotalRevenue').innerText = fmt(Total_Revenue) + " USD";
+        document.getElementById('outUnitCost').innerText = fmt(Unit_Cost) + " USD";
+        document.getElementById('outTotalCost').innerText = fmt(Total_Cost) + " USD";
+        document.getElementById('outUnitProfit').innerText = fmt(Unit_Profit) + " USD";
+        document.getElementById('outNetProfit').innerText = fmt(Net_Profit) + " USD";
+        document.getElementById('outROS').innerText = fmt(ROS) + "%";
+        document.getElementById('outROC').innerText = fmt(ROC) + "%";
+        document.getElementById('outBEP').innerText = isFinite(BEP) ? fmtInt(BEP) + " chiếc" : "Không thể hòa vốn";
+
+        // Cập nhật thông tin sang Khung PDF
+        updateStudentInfoToPDF();
+
+        document.getElementById('pdfIncotermType').innerText = currentIncoterm;
+        document.getElementById('pdfPriceTypeLabel').innerText = currentIncoterm;
+        document.getElementById('pdfLogisticsTypeLabel').innerText = currentIncoterm;
+
+        document.getElementById('pdfInpQuantity').innerText = fmtInt(Q);
+        document.getElementById('pdfInpPrice').innerText = fmt(P);
+        document.getElementById('pdfInpCogs').innerText = fmt(cogs);
+        document.getElementById('pdfInpLogistics').innerText = fmt(log);
+        document.getElementById('pdfInpAdmin').innerText = fmt(admin);
+        document.getElementById('pdfInpFixedCost').innerText = fmtInt(FC);
+
+        document.getElementById('pdfOutUnitPrice').innerText = fmt(P) + " USD";
+        document.getElementById('pdfOutTotalRevenue').innerText = fmt(Total_Revenue) + " USD";
+        document.getElementById('pdfOutUnitCogs').innerText = fmt(cogs) + " USD";
+        document.getElementById('pdfOutTotalCogs').innerText = fmt(cogs * Q) + " USD";
+        document.getElementById('pdfOutUnitLogistics').innerText = fmt(log) + " USD";
+        document.getElementById('pdfOutTotalLogistics').innerText = fmt(log * Q) + " USD";
+        document.getElementById('pdfOutUnitAdmin').innerText = fmt(admin) + " USD";
+        document.getElementById('pdfOutTotalAdmin').innerText = fmt(admin * Q) + " USD";
+
+        document.getElementById('pdfOutUnitCost').innerText = fmt(Unit_Cost) + " USD";
+        document.getElementById('pdfOutTotalCost').innerText = fmt(Total_Cost) + " USD";
+        document.getElementById('pdfOutUnitProfit').innerText = fmt(Unit_Profit) + " USD";
+        document.getElementById('pdfOutNetProfit').innerText = fmt(Net_Profit) + " USD";
+
+        document.getElementById('pdfOutROS').innerText = fmt(ROS) + "%";
+        document.getElementById('pdfOutROC').innerText = fmt(ROC) + "%";
+        document.getElementById('pdfOutBEP').innerText = isFinite(BEP) ? fmtInt(BEP) + " chiếc" : "Không thể hòa vốn";
+    }
+
+    // HÀM XUẤT IN TRỰC TIẾP
+    function generatePDF() {
+        calculate();
+        window.print();
+    }
+
+    window.onload = function() {
+        const firstBtn = document.querySelector('.sub-tab-btn');
+        switchIncoterm('EXW', firstBtn);
+    };
+</script>
+
+</body>
+</html>
