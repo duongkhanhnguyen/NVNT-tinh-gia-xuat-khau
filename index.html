@@ -271,6 +271,86 @@
             background-color: var(--gold-hover);
         }
 
+        /* ---------- PHẦN GIẢI THÍCH / NHẬN XÉT / ĐÁNH GIÁ ---------- */
+        .an-box {
+            border: 1px solid #cbd5e1;
+            border-left: 5px solid var(--header-blue);
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            background: #fbfdff;
+        }
+        .an-box h4 {
+            margin: 0 0 8px 0;
+            color: var(--header-blue);
+            font-size: 11pt;
+        }
+        .an-box p { margin: 6px 0; line-height: 1.5; font-size: 10.5pt; }
+        .an-box ul { margin: 4px 0 8px 0; padding-left: 20px; }
+        .an-box li { margin-bottom: 4px; line-height: 1.45; font-size: 10.5pt; }
+        .an-grid { display: flex; gap: 20px; margin: 8px 0; }
+        .an-grid > div { flex: 1; }
+        .c-ok   { color: #146c2e; }
+        .c-warn { color: #8a5a00; }
+        .c-bad  { color: #a71d2a; }
+        .an-grade {
+            display: inline-block;
+            padding: 4px 14px;
+            border: 2px solid var(--header-blue);
+            border-radius: 20px;
+            font-weight: bold;
+            color: var(--header-blue);
+        }
+        .an-question {
+            background: #fff8e1;
+            border: 1px dashed var(--gold);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-top: 8px;
+        }
+        textarea.note {
+            width: 100%;
+            min-height: 120px;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            font-size: 10.5pt;
+        }
+        #pdf-template .an-box {
+            border: 1px solid black;
+            border-left: 3pt solid black;
+            background: white;
+            page-break-inside: avoid;
+        }
+        #pdf-template .an-box h4 { color: black; }
+        #pdf-template .c-ok, #pdf-template .c-warn, #pdf-template .c-bad { color: black; }
+        #pdf-template .an-grade { border-color: black; color: black; }
+        #pdf-template .an-question { background: white; border-color: black; }
+        #pdf-template .an-box p, #pdf-template .an-box li { font-size: 10.5pt; }
+        #pdf-template .pdf-section-title { page-break-after: avoid; }
+        #pdf-template .pdf-table tr { page-break-inside: avoid; }
+        #pdf-note-box { border: 1px solid black; padding: 6px 8px; min-height: 40px; white-space: pre-wrap; }
+
+        .wc { font-size: 9.5pt; margin-top: 3px; }
+        select.sel {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 11pt;
+            box-sizing: border-box;
+        }
+        .ans {
+            border: 1px solid #999;
+            padding: 5px 8px;
+            margin: 3px 0 10px 0;
+            white-space: pre-wrap;
+            min-height: 28px;
+            font-size: 10.5pt;
+        }
+
         /* AN KHUNG IN TRÊN GIAO DIỆN WEB THƯỜNG */
         #pdf-template-wrapper {
             display: none;
@@ -375,6 +455,7 @@
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('tab-info', this)">1. THÔNG TIN CHUNG</button>
         <button class="tab-btn" onclick="switchTab('tab-calc', this)">2. SỐ LIỆU TÍNH TOÁN</button>
+        <button class="tab-btn" onclick="switchTab('tab-analysis', this)">3. ĐỐI CHIẾU & CHẤM ĐIỂM</button>
     </div>
 
     <!-- TAB 1: THÔNG TIN CHUNG -->
@@ -606,6 +687,68 @@
                 </tr>
             </tbody>
         </table>
+
+        <!-- SINH VIÊN TỰ GIẢI THÍCH & ĐÁNH GIÁ -->
+        <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--gold); padding-bottom: 5px; margin-top: 25px;">
+            GIẢI THÍCH & ĐÁNH GIÁ PHƯƠNG ÁN <span id="stuIncotermLabel">EXW</span> (SINH VIÊN TỰ THỰC HIỆN)
+        </h3>
+        <div class="alert-red">
+            <strong>* Yêu cầu:</strong> Dựa vào kết quả tính toán ở trên, em tự viết giải thích và đánh giá phương án này (mỗi mục tối thiểu 15 từ, nên dẫn số liệu cụ thể). Mỗi điều kiện giá (EXW, FOB, CIF, DAP, DDP) có phần trả lời riêng. Hoàn thành đủ 4 mục và chọn kết luận thì Tab 3 (đối chiếu và chấm điểm) mới mở.
+        </div>
+
+        <div class="form-group">
+            <label>1. Nhận xét kết quả: phương án lãi hay lỗ? Giải thích ý nghĩa của lợi nhuận ròng, ROS và ROC.</label>
+            <textarea id="ans1" class="note" placeholder="Ví dụ: Lô hàng có lãi ... USD, ROS = ...% cho thấy ..." oninput="saveAnswers()"></textarea>
+            <div class="wc" id="cnt1"></div>
+        </div>
+        <div class="form-group">
+            <label>2. Giải thích điểm hòa vốn và biên an toàn: lô hàng chịu được mức giảm sản lượng bao nhiêu?</label>
+            <textarea id="ans2" class="note" placeholder="Điểm hòa vốn là ... chiếc, so với sản lượng ... nên ..." oninput="saveAnswers()"></textarea>
+            <div class="wc" id="cnt2"></div>
+        </div>
+        <div class="form-group">
+            <label>3. Giải thích điều kiện giá đang chọn: người bán chịu những chi phí và rủi ro nào, vì sao chi phí logistics ở mức đã nhập?</label>
+            <textarea id="ans3" class="note" placeholder="Theo điều kiện giá này, người bán phải ... rủi ro chuyển giao tại ..." oninput="saveAnswers()"></textarea>
+            <div class="wc" id="cnt3"></div>
+        </div>
+        <div class="form-group">
+            <label>4. Hướng giải quyết, đề xuất: cần làm gì để cải thiện phương án hoặc giảm rủi ro?</label>
+            <textarea id="ans4" class="note" placeholder="Đề xuất: ..." oninput="saveAnswers()"></textarea>
+            <div class="wc" id="cnt4"></div>
+        </div>
+        <div class="form-group">
+            <label>5. Kết luận của em về phương án này:</label>
+            <select id="ansDecision" class="sel" onchange="saveAnswers()">
+                <option value="">-- Chọn kết luận --</option>
+                <option value="accept">Chấp nhận phương án</option>
+                <option value="negotiate">Chấp nhận có điều kiện (cần đàm phán / điều chỉnh)</option>
+                <option value="reject">Không chấp nhận phương án</option>
+            </select>
+        </div>
+        <div id="ansStatus"></div>
+    </div>
+
+    <!-- TAB 3: ĐỐI CHIẾU & CHẤM ĐIỂM -->
+    <div id="tab-analysis" class="tab-content">
+        <div id="anLocked" class="alert-red"></div>
+
+        <div id="anUnlocked">
+            <div class="alert-red" style="background:#fff3cd;border-color:#ffe69c;color:#664d03;">
+                <strong>Đối chiếu phương án <span id="anIncotermLabel">EXW</span>:</strong> hãy so sánh bài viết của em với phần tham khảo dưới đây, chỗ nào khác thì tự rút kinh nghiệm hoặc trao đổi với giảng viên.
+            </div>
+
+            <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--gold); padding-bottom: 5px;">A. KIẾN THỨC THAM KHẢO VỀ ĐIỀU KIỆN GIÁ</h3>
+            <div id="anExplain"></div>
+
+            <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--gold); padding-bottom: 5px;">B. NHẬN XÉT THAM KHẢO CỦA HỆ THỐNG</h3>
+            <div id="anComments"></div>
+
+            <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--gold); padding-bottom: 5px;">C. HƯỚNG GIẢI QUYẾT THAM KHẢO</h3>
+            <div id="anSolutions"></div>
+        </div>
+
+        <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--gold); padding-bottom: 5px;">D. ĐÁNH GIÁ NĂNG LỰC (TỰ ĐỘNG)</h3>
+        <div id="anScore"></div>
     </div>
 
     <!-- BẢNG ĐIỀU KHIỂN XUẤT FILE -->
@@ -731,6 +874,16 @@
             </tbody>
         </table>
 
+        <div class="pdf-section-title">IV. GIẢI THÍCH & ĐÁNH GIÁ PHƯƠNG ÁN CỦA SINH VIÊN</div>
+        <div id="pdfStuAnswers"></div>
+
+        <div class="pdf-section-title">V. ĐÁNH GIÁ NĂNG LỰC (TỰ ĐỘNG)</div>
+        <div id="pdfAnScore"></div>
+
+        <div class="pdf-section-title">VI. NHẬN XÉT ĐỐI CHIẾU CỦA HỆ THỐNG (THAM KHẢO CHO GIẢNG VIÊN)</div>
+        <div id="pdfAnComments"></div>
+        <div id="pdfAnSolutions"></div>
+
         <div class="pdf-footer">
             <div>
                 <p><strong>XÁC NHẬN CỦA SINH VIÊN</strong><br><i>(Ký và ghi rõ họ tên)</i></p>
@@ -838,6 +991,7 @@
             tbody.appendChild(tr);
         });
 
+        loadAnswers(code);
         calculate();
     }
 
@@ -971,6 +1125,432 @@
         document.getElementById('pdfOutROS').innerText = fmt(ROS) + "%";
         document.getElementById('pdfOutROC').innerText = fmt(ROC) + "%";
         document.getElementById('pdfOutBEP').innerText = isFinite(BEP) ? fmtInt(BEP) + " chiếc" : "Không thể hòa vốn";
+
+        // Giải thích, nhận xét, hướng giải quyết, đánh giá năng lực
+        renderAnalysis({ Q, P, cogs, log, admin, FC, VC_unit, Total_Revenue, Total_Cost, Unit_Cost, Net_Profit, ROS, ROC, BEP });
+    }
+
+    /* =====================================================
+       KHO KIẾN THỨC THEO TỪNG ĐIỀU KIỆN GIÁ (INCOTERMS 2020)
+       ===================================================== */
+    const incotermKB = {
+        EXW: {
+            name: 'EXW – Ex Works (Giao tại xưởng)',
+            summary: 'Người bán chỉ có nghĩa vụ đặt hàng hóa dưới quyền định đoạt của người mua tại cơ sở của mình (xưởng, kho). Người bán không phải bốc hàng lên phương tiện vận tải và không làm thủ tục thông quan xuất khẩu. Đây là điều kiện nghĩa vụ tối thiểu của người bán, giá chào thấp nhất.',
+            seller: ['Sản xuất, đóng gói, dán nhãn hàng hóa đúng hợp đồng', 'Giao hàng tại xưởng vào thời điểm thỏa thuận', 'Cung cấp thông tin/chứng từ cần thiết để người mua tự làm thủ tục'],
+            buyer: ['Bốc hàng lên xe, vận chuyển nội địa Việt Nam', 'Thông quan xuất khẩu, thuê tàu, trả cước quốc tế, mua bảo hiểm', 'Thông quan nhập khẩu, nộp thuế tại Mỹ, vận chuyển về kho'],
+            risk: 'Rủi ro chuyển từ người bán sang người mua ngay khi hàng được đặt dưới quyền định đoạt của người mua tại xưởng.',
+            formula: 'Giá EXW = COGS + Chi phí đóng gói/quản lý/C-O + Lợi nhuận mục tiêu.',
+            pros: ['Giá chào thấp, dễ cạnh tranh về con số', 'Người bán ít rủi ro vận tải và ít chi phí logistics', 'Phù hợp doanh nghiệp mới, chưa có kinh nghiệm xuất khẩu'],
+            cons: ['Người mua nước ngoài khó tự làm thủ tục xuất khẩu tại Việt Nam (thực tế hay phát sinh vướng mắc)', 'Doanh nghiệp mất quyền kiểm soát vận chuyển và không hưởng lợi từ dịch vụ logistics', 'Khó thu thuế/hoàn thuế GTGT 0% nếu không có chứng từ xuất khẩu rõ ràng'],
+            suitable: 'Người mua có đại lý/forwarder riêng tại Việt Nam, đơn hàng nhỏ, hoặc người bán muốn tối giản trách nhiệm.',
+            questions: ['Vì sao điều kiện EXW thường gây khó khăn cho người mua trong việc thông quan xuất khẩu?', 'Nếu người mua yêu cầu chuyển sang FOB, bạn phải cộng thêm những khoản chi phí nào vào giá?'],
+            tips: ['Ghi rõ trong hợp đồng ai chịu trách nhiệm bốc hàng lên xe (loading) và chi phí này.', 'Giữ bằng chứng giao hàng (biên bản giao nhận) để chứng minh thời điểm chuyển rủi ro.', 'Cân nhắc đề xuất FCA (giao cho người chuyên chở) để người bán chủ động thông quan xuất khẩu và chứng từ rõ ràng hơn.']
+        },
+        FOB: {
+            name: 'FOB – Free On Board (Giao lên tàu)',
+            summary: 'Người bán giao hàng đã thông quan xuất khẩu lên tàu do người mua chỉ định tại cảng bốc (cảng Việt Nam). Từ khi hàng lên tàu, rủi ro và chi phí chuyển sang người mua. Chỉ dùng cho vận tải đường biển và đường thủy nội địa.',
+            seller: ['Vận chuyển nội địa đến cảng, bốc hàng lên tàu', 'Làm thủ tục thông quan xuất khẩu, nộp phí THC tại cảng đi', 'Cung cấp chứng từ xuất khẩu (invoice, packing list, C/O…)'],
+            buyer: ['Thuê tàu, trả cước vận tải quốc tế', 'Mua bảo hiểm hàng hóa (nếu muốn)', 'Thông quan nhập khẩu, nộp thuế và vận chuyển nội địa tại Mỹ'],
+            risk: 'Rủi ro chuyển khi hàng đã được đặt lên tàu tại cảng bốc (Incoterms 2020: "on board the vessel").',
+            formula: 'Giá FOB = COGS + Chi phí nội địa ra cảng + Hải quan xuất + THC + Chi phí quản lý/C-O + Lợi nhuận mục tiêu.',
+            pros: ['Phổ biến, rõ ràng, phù hợp thực tiễn xuất khẩu đường biển của Việt Nam', 'Người bán không gánh cước biển và rủi ro hành trình', 'Chứng từ xuất khẩu rõ ràng, thuận lợi cho kê khai thuế/hoàn thuế'],
+            cons: ['Người mua chọn hãng tàu và lịch tàu, người bán phụ thuộc vào lịch này', 'Người bán không tận dụng được lợi nhuận từ dịch vụ vận chuyển', 'Container hàng: FOB không phù hợp nếu giao tại bãi container (nên dùng FCA)'],
+            suitable: 'Người mua mạnh về logistics (có hợp đồng cước ưu đãi), hợp đồng dài hạn, doanh nghiệp muốn giảm rủi ro hành trình.',
+            questions: ['Chi phí THC và hải quan xuất khẩu thuộc về ai theo điều kiện FOB, và đã được tính vào giá chưa?', 'Hàng bị hư hỏng khi đang cẩu lên tàu và khi đã nằm trên tàu: ai chịu trách nhiệm?'],
+            tips: ['Thỏa thuận rõ cảng bốc, thời hạn cut-off, và người chịu phí phát sinh do tàu trễ.', 'Báo giá chi phí nội địa theo từng container/chuyến, không dùng con số cảm tính.', 'Kiểm tra Master B/L và tên người gửi hàng (shipper) để tránh tranh chấp khi thanh toán L/C.']
+        },
+        CIF: {
+            name: 'CIF – Cost, Insurance and Freight (Tiền hàng, bảo hiểm và cước phí)',
+            summary: 'Người bán thuê tàu, trả cước đến cảng đích và mua bảo hiểm cho hàng hóa (mức tối thiểu ICC (C) theo Incoterms 2020). Tuy nhiên rủi ro vẫn chuyển sang người mua khi hàng đã lên tàu tại cảng bốc, chứ không phải khi đến cảng đích. Chỉ dùng cho vận tải đường biển/đường thủy nội địa.',
+            seller: ['Toàn bộ nghĩa vụ như FOB (nội địa, hải quan xuất, THC)', 'Ký hợp đồng vận tải và trả cước biển đến cảng đích', 'Mua bảo hiểm hàng hóa tối thiểu cho người mua hưởng'],
+            buyer: ['Chịu rủi ro hàng hóa trên hành trình (từ khi lên tàu)', 'Phí dỡ hàng tại cảng đến (tùy thỏa thuận), thông quan nhập khẩu, thuế tại Mỹ', 'Vận chuyển nội địa tại Mỹ'],
+            risk: 'Rủi ro chuyển khi hàng đã lên tàu tại cảng bốc; chi phí chuyển tại cảng đến. Hai điểm này khác nhau – đây là đặc điểm dễ nhầm của điều kiện C.',
+            formula: 'Giá CIF = Giá FOB + Cước vận tải quốc tế (F) + Phí bảo hiểm (I).',
+            pros: ['Người mua dễ so sánh giá và không phải lo thuê tàu', 'Người bán chủ động chọn hãng tàu, tối ưu cước, tạo thêm giá trị dịch vụ', 'Được ưa chuộng trong thanh toán bằng L/C'],
+            cons: ['Cước tàu biến động mạnh, người bán chịu rủi ro nếu cước tăng sau khi đã chốt giá', 'Dễ nhầm: người bán trả bảo hiểm nhưng không chịu rủi ro sau khi hàng lên tàu', 'Mức bảo hiểm tối thiểu có thể không đủ bảo vệ người mua'],
+            suitable: 'Người bán có hợp đồng cước tốt với hãng tàu, thị trường người mua muốn "giá trọn gói đến cảng đích", thanh toán bằng L/C.',
+            questions: ['Rủi ro hàng bị mất trên biển thuộc về ai, và bảo hiểm bồi thường cho ai?', 'Nếu cước biển tăng 30% sau khi ký hợp đồng, lợi nhuận lô hàng thay đổi thế nào?'],
+            tips: ['Gắn điều khoản điều chỉnh giá khi cước biển biến động vượt ngưỡng (ví dụ ±10%).', 'Cân nhắc mua bảo hiểm cao hơn mức tối thiểu (ICC (A)) nếu hàng giá trị cao.', 'Đối với hàng container, cân nhắc CIP thay cho CIF.']
+        },
+        DAP: {
+            name: 'DAP – Delivered at Place (Giao tại nơi đến)',
+            summary: 'Người bán chịu toàn bộ chi phí và rủi ro đưa hàng đến địa điểm đến chỉ định tại nước nhập khẩu (ví dụ kho người mua tại Mỹ), hàng sẵn sàng để dỡ trên phương tiện vận tải. Người bán không phải dỡ hàng và không làm thủ tục thông quan nhập khẩu.',
+            seller: ['Toàn bộ nghĩa vụ vận chuyển nội địa, hải quan xuất, cước quốc tế', 'Vận chuyển đến điểm đến chỉ định tại Mỹ (chưa dỡ hàng)', 'Chịu mọi rủi ro hàng hóa cho đến khi hàng đến nơi'],
+            buyer: ['Dỡ hàng khỏi phương tiện vận tải tại điểm đến', 'Thông quan nhập khẩu, nộp thuế nhập khẩu và các loại phí tại Mỹ', 'Nhận hàng đúng thời gian để tránh lưu kho, lưu bãi'],
+            risk: 'Rủi ro chuyển khi hàng đến địa điểm chỉ định, sẵn sàng để dỡ. Người bán chịu rủi ro toàn bộ hành trình.',
+            formula: 'Giá DAP = Giá CIF (hoặc FOB + cước) + Chi phí vận chuyển nội địa nước nhập khẩu + Phụ phí rủi ro dự phòng.',
+            pros: ['Người mua yên tâm vì giá gần như trọn gói đến kho', 'Người bán kiểm soát chuỗi vận chuyển và chất lượng dịch vụ', 'Tăng sức cạnh tranh với người mua ít kinh nghiệm logistics'],
+            cons: ['Người bán gánh rủi ro hành trình dài và chi phí biến động (cước, phí lưu bãi, phí chậm trễ)', 'Dễ phát sinh tranh chấp về địa điểm đến chính xác và thời gian dỡ hàng', 'Cần đối tác logistics đáng tin cậy tại Mỹ'],
+            suitable: 'Người bán có năng lực logistics và đại lý tại thị trường đích, muốn nâng giá trị dịch vụ trọn gói nhưng không muốn dính thuế nhập khẩu.',
+            questions: ['Ai chịu chi phí dỡ hàng và phí lưu container (demurrage/detention) nếu người mua nhận hàng trễ?', 'Vì sao DAP được xem là an toàn hơn DDP cho người bán khi thuế nhập khẩu tại Mỹ biến động?'],
+            tips: ['Ghi rõ địa chỉ đến, thời gian nhận hàng và quy định phí lưu bãi trong hợp đồng.', 'Mua bảo hiểm toàn hành trình (người bán chịu rủi ro đến kho).', 'Chọn forwarder/đại lý tại Mỹ có đánh giá tốt và minh bạch phụ phí.']
+        },
+        DDP: {
+            name: 'DDP – Delivered Duty Paid (Giao đã nộp thuế)',
+            summary: 'Điều kiện có nghĩa vụ lớn nhất của người bán: chịu mọi chi phí và rủi ro đến khi giao hàng tại địa điểm đến chỉ định, bao gồm thông quan nhập khẩu và nộp thuế nhập khẩu tại nước người mua (Mỹ). Người mua chỉ cần nhận và dỡ hàng.',
+            seller: ['Mọi nghĩa vụ như DAP', 'Thông quan nhập khẩu tại Mỹ, nộp thuế nhập khẩu và các phụ phí', 'Chịu mọi rủi ro, chi phí cho đến khi hàng đến địa điểm chỉ định'],
+            buyer: ['Dỡ hàng tại điểm đến', 'Nhận hàng và thanh toán theo hợp đồng'],
+            risk: 'Rủi ro chuyển khi hàng đến địa điểm chỉ định, đã thông quan nhập khẩu và sẵn sàng để dỡ. Người bán chịu rủi ro lớn nhất.',
+            formula: 'Giá DDP = Giá DAP + Thuế nhập khẩu Mỹ + Phí thông quan nhập khẩu + Phụ phí rủi ro (tỷ giá, thuế, lưu bãi).',
+            pros: ['Giá trọn gói, người mua dễ so sánh và rất thuận tiện', 'Tăng khả năng thắng thầu với khách hàng ngại thủ tục', 'Người bán kiểm soát toàn bộ chuỗi cung ứng'],
+            cons: ['Rủi ro tài chính cao nhất: thuế nhập khẩu Mỹ (kể cả thuế bổ sung) có thể thay đổi bất ngờ', 'Người bán phải làm thủ tục nhập khẩu tại Mỹ (cần đại diện/importer of record), phức tạp và dễ sai sót', 'Chi phí dự phòng khó ước tính, dễ bị lỗ nếu tính thiếu'],
+            suitable: 'Doanh nghiệp đã có đại diện/đối tác nhập khẩu tại Mỹ, hợp đồng giá ổn định, biên lợi nhuận đủ lớn để chịu rủi ro thuế.',
+            questions: ['Nếu Mỹ tăng thuế nhập khẩu thêm 10% sau khi ký hợp đồng DDP, lợi nhuận lô hàng thay đổi ra sao?', 'Có nên chấp nhận DDP nếu bạn không có đối tác nhập khẩu tại Mỹ? Vì sao?'],
+            tips: ['Đưa điều khoản điều chỉnh giá khi thuế suất thay đổi (tax adjustment clause) nếu đối tác chấp nhận.', 'Xác định rõ mã HS để áp thuế chính xác ngay từ khi báo giá.', 'Dự phòng ít nhất 3–5% giá trị hợp đồng cho biến động thuế/phí; cân nhắc chuyển sang DAP nếu rủi ro quá cao.']
+        }
+    };
+
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function liList(arr) {
+        return '<ul>' + arr.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+    }
+    function cmt(type, text) {
+        const icon = type === 'ok' ? '✔ ' : (type === 'warn' ? '⚠ ' : '✘ ');
+        return '<li class="c-' + type + '">' + icon + text + '</li>';
+    }
+
+    function buildExplain(code) {
+        const kb = incotermKB[code];
+        return '<div class="an-box">' +
+            '<h4>' + kb.name + '</h4>' +
+            '<p>' + kb.summary + '</p>' +
+            '<div class="an-grid">' +
+                '<div><b>Người bán (doanh nghiệp Việt Nam) chịu trách nhiệm:</b>' + liList(kb.seller) + '</div>' +
+                '<div><b>Người mua (Hoa Kỳ) chịu trách nhiệm:</b>' + liList(kb.buyer) + '</div>' +
+            '</div>' +
+            '<p><b>Điểm chuyển rủi ro:</b> ' + kb.risk + '</p>' +
+            '<p><b>Cách cấu thành giá:</b> ' + kb.formula + '</p>' +
+            '<div class="an-grid">' +
+                '<div><b>Ưu điểm:</b>' + liList(kb.pros) + '</div>' +
+                '<div><b>Hạn chế / Rủi ro:</b>' + liList(kb.cons) + '</div>' +
+            '</div>' +
+            '<p><b>Phù hợp khi:</b> ' + kb.suitable + '</p>' +
+            '<div class="an-question"><b>Câu hỏi gợi mở cho sinh viên:</b>' + liList(kb.questions) + '</div>' +
+        '</div>';
+    }
+
+    function buildComments(code, m) {
+        const items = [];
+        const margin = m.P - m.VC_unit;
+        const marginPct = m.P > 0 ? (margin / m.P) * 100 : 0;
+        const MOS = (m.Q > 0 && isFinite(m.BEP)) ? ((m.Q - m.BEP) / m.Q) * 100 : -Infinity;
+
+        // 1. Lợi nhuận
+        if (m.Net_Profit < 0) {
+            items.push(cmt('bad', '<b>Lô hàng bị lỗ ' + fmt(Math.abs(m.Net_Profit)) + ' USD</b> (ROS = ' + fmt(m.ROS) + '%). Với điều kiện ' + code + ' và số liệu hiện tại, chưa nên ký hợp đồng.'));
+        } else if (m.ROS < 5) {
+            items.push(cmt('warn', 'Lợi nhuận ròng ' + fmt(m.Net_Profit) + ' USD, ROS chỉ ' + fmt(m.ROS) + '% – biên lợi nhuận <b>quá mỏng</b>, chỉ cần tăng chi phí nhỏ (cước, tỷ giá) là có thể lỗ.'));
+        } else if (m.ROS <= 30) {
+            items.push(cmt('ok', 'Lợi nhuận ròng ' + fmt(m.Net_Profit) + ' USD, ROS = ' + fmt(m.ROS) + '%, ROC = ' + fmt(m.ROC) + '% – <b>mức sinh lời tốt</b> và hợp lý cho một lô hàng xuất khẩu may mặc.'));
+        } else {
+            items.push(cmt('warn', 'ROS = ' + fmt(m.ROS) + '% là <b>rất cao</b>, khó đạt trong thực tế ngành may mặc. Hãy kiểm tra có bỏ sót khoản chi phí nào hoặc giá chào có thiếu cạnh tranh không.'));
+        }
+
+        // 2. Số dư đảm phí
+        if (margin <= 0) {
+            items.push(cmt('bad', 'Giá bán (' + fmt(m.P) + ') <b>không bù đắp được biến phí</b> (' + fmt(m.VC_unit) + ' USD/chiếc). Bán càng nhiều càng lỗ, không thể hòa vốn.'));
+        } else {
+            items.push(cmt(marginPct >= 15 ? 'ok' : 'warn', 'Số dư đảm phí (lãi trên biến phí) là <b>' + fmt(margin) + ' USD/chiếc</b> (' + fmt(marginPct) + '% giá bán). Mỗi chiếc bán thêm sau điểm hòa vốn đóng góp đúng khoản này vào lợi nhuận.'));
+        }
+
+        // 3. Điểm hòa vốn
+        if (!isFinite(m.BEP)) {
+            items.push(cmt('bad', 'Không có điểm hòa vốn vì số dư đảm phí ≤ 0. Cần tăng giá hoặc giảm biến phí trước khi bàn đến sản lượng.'));
+        } else if (MOS >= 30) {
+            items.push(cmt('ok', 'Điểm hòa vốn <b>' + fmtInt(m.BEP) + ' chiếc</b> chỉ bằng ' + fmt(100 - MOS) + '% sản lượng lô hàng; biên an toàn <b>' + fmt(MOS) + '%</b> – lô hàng chịu được biến động khá tốt.'));
+        } else if (MOS >= 10) {
+            items.push(cmt('warn', 'Điểm hòa vốn ' + fmtInt(m.BEP) + ' chiếc; biên an toàn ' + fmt(MOS) + '% ở mức trung bình. Nếu đơn hàng bị cắt giảm trên ' + fmt(MOS) + '% sản lượng, doanh nghiệp sẽ lỗ.'));
+        } else if (MOS >= 0) {
+            items.push(cmt('bad', 'Điểm hòa vốn ' + fmtInt(m.BEP) + ' chiếc gần bằng sản lượng lô hàng (biên an toàn chỉ ' + fmt(MOS) + '%) – <b>rủi ro cao</b>.'));
+        } else {
+            items.push(cmt('bad', 'Điểm hòa vốn ' + fmtInt(m.BEP) + ' chiếc <b>lớn hơn sản lượng lô hàng</b> (' + fmtInt(m.Q) + ' chiếc) nên lô hàng chắc chắn lỗ.'));
+        }
+
+        // 4. Cơ cấu chi phí
+        if (m.P > 0) {
+            const cogsPct = (m.cogs / m.P) * 100;
+            const logPct = (m.log / m.P) * 100;
+            const fcPct = m.Total_Cost > 0 ? (m.FC / m.Total_Cost) * 100 : 0;
+            items.push(cmt(cogsPct > 75 ? 'warn' : 'ok', 'COGS chiếm <b>' + fmt(cogsPct) + '%</b> giá bán' + (cogsPct > 75 ? ' – tỷ trọng cao, dư địa lợi nhuận hẹp, nên rà soát nguyên phụ liệu và nhân công.' : ' – ở mức chấp nhận được.')));
+            items.push(cmt(logPct > 20 ? 'warn' : 'ok', 'Chi phí Logistics chiếm <b>' + fmt(logPct) + '%</b> giá bán' + (logPct > 20 ? ' – khá cao, cần đàm phán lại cước hoặc tối ưu chuyến hàng.' : ' – hợp lý với điều kiện ' + code + '.')));
+            items.push(cmt(fcPct > 25 ? 'warn' : 'ok', 'Định phí chiếm <b>' + fmt(fcPct) + '%</b> tổng chi phí' + (fcPct > 25 ? ' – tỷ trọng lớn nên lợi nhuận rất nhạy cảm với sản lượng.' : ' – tỷ trọng thấp, chi phí chủ yếu là biến phí nên ít rủi ro khi sản lượng giảm.')));
+        }
+
+        // 5. So sánh với điều kiện giá
+        const cfg = incotermConfigs[code];
+        const refLog = cfg.items.reduce((s, i) => s + i.val, 0);
+        if (refLog > 0) {
+            const ratio = m.log / refLog;
+            if (ratio < 0.8) {
+                items.push(cmt('bad', 'Chi phí Logistics nhập vào (' + fmt(m.log) + ') thấp hơn nhiều so với mức tham chiếu của ' + code + ' (~' + fmt(refLog) + ' USD/chiếc). <b>Có thể đã bỏ sót hạng mục</b> mà người bán phải chịu theo điều kiện này.'));
+            } else if (ratio > 1.5) {
+                items.push(cmt('warn', 'Chi phí Logistics (' + fmt(m.log) + ') cao hơn nhiều so với mức tham chiếu (~' + fmt(refLog) + ' USD/chiếc); kiểm tra có tính trùng hoặc chi phí không thuộc nghĩa vụ người bán không.'));
+            } else {
+                items.push(cmt('ok', 'Chi phí Logistics (' + fmt(m.log) + ') phù hợp mức tham chiếu của ' + code + ' (~' + fmt(refLog) + ' USD/chiếc) – đã bao quát nghĩa vụ chính của người bán.'));
+            }
+            const pDiff = cfg.defaultPrice > 0 ? ((m.P - cfg.defaultPrice) / cfg.defaultPrice) * 100 : 0;
+            if (Math.abs(pDiff) <= 10) {
+                items.push(cmt('ok', 'Giá bán ' + fmt(m.P) + ' USD sát mức tham chiếu thị trường của ' + code + ' (' + fmt(cfg.defaultPrice) + ' USD).'));
+            } else if (pDiff > 0) {
+                items.push(cmt('warn', 'Giá bán cao hơn mức tham chiếu ' + fmt(pDiff) + '% – lợi nhuận tốt nhưng <b>có nguy cơ mất đơn hàng</b> do thiếu cạnh tranh.'));
+            } else {
+                items.push(cmt('warn', 'Giá bán thấp hơn mức tham chiếu ' + fmt(Math.abs(pDiff)) + '% – dễ thắng đơn nhưng cần kiểm tra lại biên lợi nhuận.'));
+            }
+        }
+
+        return '<div class="an-box"><ul>' + items.join('') + '</ul></div>';
+    }
+
+    function buildSolutions(code, m) {
+        const kb = incotermKB[code];
+        const sols = [];
+        const targetROS = 0.10;
+        const pTarget = m.Q > 0 ? (m.VC_unit * m.Q + m.FC) / (m.Q * (1 - targetROS)) : 0;
+        const margin = m.P - m.VC_unit;
+        const MOS = (m.Q > 0 && isFinite(m.BEP)) ? ((m.Q - m.BEP) / m.Q) * 100 : -Infinity;
+        const logPct = m.P > 0 ? (m.log / m.P) * 100 : 0;
+        const cogsPct = m.P > 0 ? (m.cogs / m.P) * 100 : 0;
+
+        sols.push('<b>Giá bán tối thiểu để hòa vốn</b> với sản lượng hiện tại là <b>' + fmt(m.Unit_Cost) + ' USD/chiếc</b>; để đạt ROS 10% cần chào khoảng <b>' + fmt(pTarget) + ' USD/chiếc</b>.');
+
+        if (m.Net_Profit < 0 || m.ROS < 5) {
+            const gap = Math.max(0, pTarget - m.P);
+            sols.push('<b>Điều chỉnh giá:</b> ' + (gap > 0 ? 'tăng giá thêm khoảng ' + fmt(gap) + ' USD/chiếc (hoặc giảm tổng chi phí tương ứng) để đạt ROS 10%.' : 'giá hiện tại đã đủ, hãy tập trung kiểm soát chi phí.'));
+            sols.push('<b>Giảm giá thành (COGS):</b> đàm phán lại giá vải, tối ưu định mức nguyên liệu, tăng năng suất may để giảm nhân công/chiếc, hạn chế hàng lỗi.');
+            sols.push('<b>Tăng sản lượng hoặc gộp đơn:</b> phân bổ định phí trên nhiều sản phẩm hơn để giảm chi phí đơn vị.');
+        }
+        if (m.Net_Profit >= 0 && MOS < 30 && isFinite(m.BEP)) {
+            sols.push('<b>Tăng biên an toàn:</b> ký hợp đồng có sản lượng cam kết tối thiểu (MOQ), giảm định phí phân bổ cho lô hàng hoặc đàm phán đặt cọc/ứng trước.');
+        }
+        if (logPct > 20) {
+            sols.push('<b>Tối ưu logistics:</b> so sánh báo giá ít nhất 3 hãng tàu/forwarder, gom hàng đầy container (FCL), chọn tuyến và thời điểm cước thấp.');
+        }
+        if (cogsPct > 75) {
+            sols.push('<b>Rà soát cơ cấu COGS:</b> vải và phụ liệu đang chiếm tỷ trọng lớn; cân nhắc nhà cung cấp thay thế hoặc mua số lượng lớn để hưởng chiết khấu.');
+        }
+        if (m.ROS > 30) {
+            sols.push('<b>Kiểm tra tính cạnh tranh:</b> biên lợi nhuận quá cao so với thực tế; rà soát lại các khoản chi phí chưa tính (bao bì, kiểm định, tỷ giá, bảo hiểm…) trước khi chào giá.');
+        }
+        if (m.Net_Profit >= 0 && m.ROS >= 5 && m.ROS <= 30 && MOS >= 30) {
+            sols.push('<b>Khuyến nghị:</b> có thể chấp nhận chào giá. Hãy thêm điều khoản bảo vệ lợi nhuận (điều chỉnh giá khi chi phí vượt ngưỡng) và lập phương án dự phòng.');
+        }
+        sols.push('<b>Phân tích độ nhạy:</b> thử thay đổi giá bán, cước, COGS ±5–10% ở Tab 2 để xem lợi nhuận và điểm hòa vốn biến động thế nào, đó là cơ sở để quyết định chấp nhận hay đàm phán.');
+
+        return '<div class="an-box">' +
+            '<h4>Hướng giải quyết theo số liệu hiện tại</h4>' + liList(sols) +
+            '<h4 style="margin-top:12px;">Lưu ý riêng cho điều kiện ' + code + '</h4>' + liList(kb.tips) +
+        '</div>';
+    }
+
+    /* ===== PHẦN SINH VIÊN TỰ GIẢI THÍCH / ĐÁNH GIÁ ===== */
+    const studentAnswers = {};
+    const ANS_FIELDS = ['ans1', 'ans2', 'ans3', 'ans4'];
+    const ANS_TITLES = [
+        '1. Nhận xét kết quả (lợi nhuận, ROS, ROC)',
+        '2. Giải thích điểm hòa vốn và biên an toàn',
+        '3. Giải thích điều kiện giá và chi phí/rủi ro của người bán',
+        '4. Hướng giải quyết, đề xuất'
+    ];
+    const MIN_WORDS = 15;
+    const DECISION_LABELS = {
+        accept: 'Chấp nhận phương án',
+        negotiate: 'Chấp nhận có điều kiện (cần đàm phán / điều chỉnh)',
+        reject: 'Không chấp nhận phương án'
+    };
+    const DECISION_ORDER = ['accept', 'negotiate', 'reject'];
+
+    function wordCount(t) {
+        t = (t || '').trim();
+        return t ? t.split(/\s+/).length : 0;
+    }
+    function getAnswers(code) {
+        if (!studentAnswers[code]) studentAnswers[code] = { ans1: '', ans2: '', ans3: '', ans4: '', decision: '' };
+        return studentAnswers[code];
+    }
+    function saveAnswers() {
+        const a = getAnswers(currentIncoterm);
+        ANS_FIELDS.forEach(id => { a[id] = document.getElementById(id).value; });
+        a.decision = document.getElementById('ansDecision').value;
+        calculate();
+    }
+    function loadAnswers(code) {
+        const a = getAnswers(code);
+        ANS_FIELDS.forEach(id => { document.getElementById(id).value = a[id]; });
+        document.getElementById('ansDecision').value = a.decision;
+        document.getElementById('stuIncotermLabel').innerText = code;
+    }
+    function recommendDecision(m) {
+        const MOS = (m.Q > 0 && isFinite(m.BEP)) ? ((m.Q - m.BEP) / m.Q) * 100 : -Infinity;
+        if (m.Net_Profit < 0 || !isFinite(m.BEP) || MOS < 0) return 'reject';
+        if (m.ROS < 5 || MOS < 30 || m.ROS > 30) return 'negotiate';
+        return 'accept';
+    }
+    function pt(x) { return Number(x.toFixed(2)); }
+    function reEsc(t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    function buildScore(code, m) {
+        const cfg = incotermConfigs[code];
+        const a = getAnswers(code);
+        const refLog = cfg.items.reduce((s, i) => s + i.val, 0);
+        const margin = m.P - m.VC_unit;
+        const MOS = (m.Q > 0 && isFinite(m.BEP)) ? ((m.Q - m.BEP) / m.Q) * 100 : -Infinity;
+        const rows = [];
+        const sec = (t) => rows.push({ section: t });
+        const add = (label, max, score, comment) => rows.push({ label, max, score: pt(score), comment });
+
+        sec('PHẦN I. SỐ LIỆU VÀ KẾT QUẢ TÍNH TOÁN (5 điểm)');
+
+        const infoOk = ['studentName', 'studentId', 'className', 'teacherName'].every(id => document.getElementById(id).value.trim() !== '');
+        add('Điền đầy đủ thông tin sinh viên', 0.5, infoOk ? 0.5 : 0, infoOk ? 'Đầy đủ.' : 'Còn thiếu họ tên/MSSV/lớp/giảng viên.');
+
+        const namesOk = Array.from(document.querySelectorAll('.detail-table tbody input[type="text"]')).every(i => i.value.trim() !== '');
+        add('Ghi rõ tên các hạng mục chi phí', 0.5, namesOk ? 0.5 : 0, namesOk ? 'Tất cả hạng mục đều có tên.' : 'Có hạng mục chưa đặt tên.');
+
+        const ratio = refLog > 0 ? m.log / refLog : 1;
+        let s3 = 0, c3 = '';
+        if (ratio >= 0.8 && ratio <= 1.5) { s3 = 1; c3 = 'Logistics phù hợp nghĩa vụ người bán theo ' + code + '.'; }
+        else if (ratio >= 0.5 || ratio > 1.5) { s3 = 0.5; c3 = ratio > 1.5 ? 'Logistics cao bất thường, kiểm tra tính trùng.' : 'Logistics còn thiếu so với nghĩa vụ ' + code + '.'; }
+        else { c3 = 'Thiếu nhiều hạng mục logistics bắt buộc của ' + code + '.'; }
+        add('Chi phí logistics đúng nghĩa vụ ' + code, 1, s3, c3);
+
+        const pDiff = cfg.defaultPrice > 0 ? Math.abs(m.P - cfg.defaultPrice) / cfg.defaultPrice : 0;
+        let s4 = 0, c4 = '';
+        if (margin <= 0) { c4 = 'Giá bán không bù đắp được biến phí.'; }
+        else if (pDiff <= 0.25) { s4 = 1; c4 = 'Giá hợp lý, sát mặt bằng thị trường.'; }
+        else if (pDiff <= 0.5) { s4 = 0.5; c4 = 'Giá lệch khá xa so với mức tham chiếu thị trường.'; }
+        else { c4 = 'Giá lệch quá xa thực tế thị trường.'; }
+        add('Giá bán hợp lý (bù đắp chi phí, sát thị trường)', 1, s4, c4);
+
+        let s5 = 0, c5 = '';
+        if (m.ROS >= 8 && m.ROS <= 30) { s5 = 1; c5 = 'ROS ' + fmt(m.ROS) + '% – hiệu quả tốt, thực tế.'; }
+        else if (m.ROS >= 0) { s5 = 0.5; c5 = m.ROS > 30 ? 'ROS quá cao, thiếu thực tế.' : 'ROS thấp (<8%), hiệu quả hạn chế.'; }
+        else { c5 = 'Lô hàng bị lỗ.'; }
+        add('Hiệu quả lợi nhuận (ROS 8–30%)', 1, s5, c5);
+
+        let s6 = 0, c6 = '';
+        if (MOS >= 30) { s6 = 1; c6 = 'Biên an toàn ' + fmt(MOS) + '% – an toàn.'; }
+        else if (MOS >= 10) { s6 = 0.5; c6 = 'Biên an toàn ' + fmt(MOS) + '% – trung bình.'; }
+        else { c6 = isFinite(m.BEP) ? 'Biên an toàn quá thấp hoặc âm.' : 'Không có điểm hòa vốn.'; }
+        add('Điểm hòa vốn & biên an toàn (≥30%)', 1, s6, c6);
+
+        sec('PHẦN II. SINH VIÊN TỰ GIẢI THÍCH VÀ ĐÁNH GIÁ (5 điểm)');
+
+        const filled = ANS_FIELDS.filter(id => wordCount(a[id]) >= MIN_WORDS).length;
+        add('Viết đủ 4 mục (mỗi mục ≥ ' + MIN_WORDS + ' từ)', 1, filled / 4, 'Hoàn thành ' + filled + '/4 mục.');
+
+        const text = ANS_FIELDS.map(id => a[id]).join(' ').toLowerCase();
+        const kws = ['lợi nhuận', 'doanh thu', 'chi phí', 'hòa vốn', 'biên an toàn', 'ros', 'roc', 'rủi ro', 'giá bán', 'định phí', 'biến phí', 'logistics', code.toLowerCase()];
+        const hits = kws.filter(k => text.includes(k)).length;
+        const kwScore = Math.min(hits / 8, 1) * 0.75;
+
+        const flat = text.replace(/,/g, '');
+        const groups = [
+            isFinite(m.BEP) ? [fmtInt(m.BEP), String(Math.ceil(m.BEP))] : [],
+            [fmt(m.ROS), m.ROS.toFixed(1), m.ROS.toFixed(0)],
+            [fmt(m.ROC), m.ROC.toFixed(1), m.ROC.toFixed(0)],
+            [Math.round(Math.abs(m.Net_Profit)).toString(), fmt(Math.abs(m.Net_Profit))],
+            [fmt(m.Unit_Cost)]
+        ].map(g => g.map(x => String(x).replace(/,/g, '')));
+        const numHit = groups.filter(g => g.some(c => c && c !== '0' && new RegExp('(?<![\\d.])' + reEsc(c) + '(?!\\d)').test(flat))).length;
+        const numScore = numHit >= 2 ? 0.75 : (numHit === 1 ? 0.4 : 0);
+        add('Dùng đúng thuật ngữ và dẫn số liệu của phương án', 1.5, kwScore + numScore,
+            'Dùng ' + hits + ' thuật ngữ chính; dẫn đúng ' + numHit + ' chỉ tiêu số liệu' + (numHit < 2 ? ' (cần dẫn ít nhất 2).' : '.'));
+
+        const rec = recommendDecision(m);
+        let s8 = 0, c8;
+        if (!a.decision) { c8 = 'Chưa chọn kết luận.'; }
+        else {
+            const diff = Math.abs(DECISION_ORDER.indexOf(a.decision) - DECISION_ORDER.indexOf(rec));
+            s8 = diff === 0 ? 1.5 : (diff === 1 ? 0.75 : 0);
+            c8 = diff === 0 ? 'Kết luận phù hợp với kết quả tính toán.' : (diff === 1 ? 'Kết luận gần đúng, chưa sát số liệu (hệ thống gợi ý: ' + DECISION_LABELS[rec] + ').' : 'Kết luận mâu thuẫn với số liệu (hệ thống gợi ý: ' + DECISION_LABELS[rec] + ').');
+        }
+        add('Kết luận phù hợp với kết quả tính toán', 1.5, s8, c8);
+
+        const actionKws = ['tăng giá', 'giảm chi phí', 'giảm giá thành', 'đàm phán', 'cước', 'sản lượng', 'điều khoản', 'thuế', 'nhà cung cấp', 'tối ưu', 'bảo hiểm', 'hợp đồng', 'dự phòng', 'giá thành'];
+        const aText = (a.ans4 || '').toLowerCase();
+        const actHits = actionKws.filter(k => aText.includes(k)).length;
+        const s9 = (wordCount(a.ans4) >= MIN_WORDS ? 0.4 : 0) + (actHits >= 2 ? 0.6 : (actHits === 1 ? 0.3 : 0));
+        add('Đề xuất hướng giải quyết cụ thể', 1, s9, actHits >= 2 ? 'Có nêu các biện pháp cụ thể.' : 'Cần nêu rõ hơn biện pháp (giá, chi phí, cước, sản lượng, điều khoản…).');
+
+        const items = rows.filter(r => !r.section);
+        const total = pt(items.reduce((s, r) => s + r.score, 0));
+        const max = pt(items.reduce((s, r) => s + r.max, 0));
+        let grade, advice;
+        if (total >= 9) { grade = 'Xuất sắc'; advice = 'Số liệu hợp lý, phân tích tốt. Có thể thử các tình huống khó hơn (tăng cước, tăng thuế, giảm sản lượng).'; }
+        else if (total >= 8) { grade = 'Giỏi'; advice = 'Kết quả tốt, cần chú ý các tiêu chí chưa đạt tối đa ở bảng trên.'; }
+        else if (total >= 6.5) { grade = 'Khá'; advice = 'Hiểu cơ bản; cần rà soát lại cơ cấu chi phí và lập luận đánh giá.'; }
+        else if (total >= 5) { grade = 'Trung bình'; advice = 'Cần ôn lại nghĩa vụ người bán theo từng Incoterms và cách tính điểm hòa vốn.'; }
+        else { grade = 'Yếu'; advice = 'Cần xem lại kiến thức Incoterms, cách phân loại biến phí/định phí và hoàn thiện phần giải thích.'; }
+
+        let n = 0;
+        const body = rows.map(r => {
+            if (r.section) return '<tr><td colspan="4" style="background:#f2f2f2;font-weight:bold;">' + r.section + '</td></tr>';
+            n++;
+            return '<tr><td>' + n + '. ' + r.label + '</td>' +
+                '<td style="text-align:center;">' + r.max + '</td>' +
+                '<td style="text-align:center;font-weight:bold;">' + r.score + '</td>' +
+                '<td>' + r.comment + '</td></tr>';
+        }).join('');
+
+        return '<table class="pdf-table" style="background:#fff;">' +
+            '<thead><tr><th>Tiêu chí</th><th style="width:70px;">Điểm tối đa</th><th style="width:70px;">Điểm đạt</th><th>Nhận xét</th></tr></thead>' +
+            '<tbody>' + body +
+            '<tr><td><strong>TỔNG ĐIỂM (tự động)</strong></td><td style="text-align:center;"><strong>' + max + '</strong></td><td style="text-align:center;"><strong>' + total + '</strong></td><td><strong>Xếp loại: ' + grade + '</strong></td></tr>' +
+            '</tbody></table>' +
+            '<p><span class="an-grade">' + total + '/' + max + ' – ' + grade + '</span> &nbsp; ' + advice + '</p>' +
+            '<p style="font-size:9.5pt;font-style:italic;">Ghi chú: điểm Phần II được chấm tự động theo độ đầy đủ, thuật ngữ, số liệu dẫn và mức phù hợp của kết luận; giảng viên đọc bài viết và điều chỉnh điểm cuối cùng.</p>';
+    }
+
+    function buildStudentAnswersHTML(code) {
+        const a = getAnswers(code);
+        let h = '<p><b>Điều kiện giá đang đánh giá:</b> ' + code + '</p>';
+        ANS_FIELDS.forEach((id, i) => {
+            h += '<p style="margin-bottom:2px;"><b>' + ANS_TITLES[i] + ':</b></p><div class="ans">' + (esc(a[id].trim()) || '(Sinh viên chưa viết)') + '</div>';
+        });
+        h += '<p><b>5. Kết luận của sinh viên:</b> ' + (a.decision ? DECISION_LABELS[a.decision] : '(Chưa chọn)') + '</p>';
+        return h;
+    }
+
+    function renderAnalysis(m) {
+        const code = currentIncoterm;
+        const a = getAnswers(code);
+        document.getElementById('anIncotermLabel').innerText = code;
+
+        const missing = [];
+        ANS_FIELDS.forEach((id, i) => {
+            const wc = wordCount(a[id]);
+            const el = document.getElementById('cnt' + (i + 1));
+            el.innerText = wc + ' / ' + MIN_WORDS + ' từ tối thiểu';
+            el.style.color = wc >= MIN_WORDS ? '#146c2e' : '#a71d2a';
+            if (wc < MIN_WORDS) missing.push('mục ' + (i + 1));
+        });
+        if (!a.decision) missing.push('kết luận (mục 5)');
+        const unlocked = missing.length === 0;
+
+        document.getElementById('ansStatus').innerHTML = unlocked
+            ? '<div class="an-box"><span class="c-ok">✔ Đã hoàn thành phần giải thích phương án ' + code + '. Em có thể sang Tab 3 để đối chiếu và xem điểm.</span></div>'
+            : '<div class="an-box"><span class="c-warn">⚠ Chưa hoàn thành, còn thiếu: ' + missing.join(', ') + '.</span></div>';
+
+        document.getElementById('anLocked').style.display = unlocked ? 'none' : 'block';
+        document.getElementById('anUnlocked').style.display = unlocked ? 'block' : 'none';
+        document.getElementById('anLocked').innerHTML = '<strong>* Chưa mở phần đối chiếu.</strong> Hãy quay lại Tab 2 và tự viết giải thích, đánh giá cho phương án <b>' + code + '</b> (còn thiếu: ' + missing.join(', ') + '). Phần nhận xét tham khảo của hệ thống chỉ hiện sau khi em đã hoàn thành.';
+
+        const comments = buildComments(code, m);
+        const solutions = buildSolutions(code, m);
+        const score = buildScore(code, m);
+
+        document.getElementById('anExplain').innerHTML = buildExplain(code);
+        document.getElementById('anComments').innerHTML = comments;
+        document.getElementById('anSolutions').innerHTML = solutions;
+        document.getElementById('anScore').innerHTML = score;
+
+        document.getElementById('pdfStuAnswers').innerHTML = buildStudentAnswersHTML(code);
+        document.getElementById('pdfAnScore').innerHTML = score;
+        document.getElementById('pdfAnComments').innerHTML = comments;
+        document.getElementById('pdfAnSolutions').innerHTML = solutions;
     }
 
     // HÀM XUẤT IN TRỰC TIẾP
